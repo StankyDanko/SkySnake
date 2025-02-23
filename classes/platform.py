@@ -1,6 +1,5 @@
-# platform.py
 import pygame
-from config import GREY
+from config.config import GREY
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, w, h):

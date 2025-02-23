@@ -1,10 +1,7 @@
 import pygame
 import logging  # Import logging module
-from config import WHITE, WIDTH, HEIGHT, velocity_multipliers
-from projectile import Projectile
-
-# Configure logging for player actions
-logging.basicConfig(filename='game.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+from config.config import WHITE, WIDTH, HEIGHT, velocity_multipliers
+from classes.projectile import Projectile
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):

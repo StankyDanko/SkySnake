@@ -1,17 +1,31 @@
 import pygame
 import random
 import math
-import logging  # Import logging module
-from config import *
-from platform import Platform
-from projectile import Projectile
-from food import Food
-from acid_droplet import AcidDroplet
-from sky_snake import SkySnake
-from player import Player
+import logging
+import os  # Import os for file operations
+from config.config import *
+from classes.platform import Platform
+from classes.projectile import Projectile
+from classes.food import Food
+from classes.acid_droplet import AcidDroplet
+from classes.sky_snake import SkySnake
+from classes.player import Player
 
-# Configure logging
-logging.basicConfig(filename='game.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+# Rotate log files
+if os.path.exists('game.log.3'):
+    os.remove('game.log.3')
+if os.path.exists('game.log.2'):
+    os.rename('game.log.2', 'game.log.3')
+if os.path.exists('game.log.1'):
+    os.rename('game.log.1', 'game.log.2')
+
+# Set up logging to game.log.1 for the current session
+logging.basicConfig(
+    filename='game.log.1',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filemode='w'  # Overwrite if exists
+)
 
 # Initialize Pygame
 pygame.init()
@@ -24,7 +38,7 @@ pygame.display.set_caption("Slingshot Hero")
 font = pygame.font.Font(None, 36)
 
 # Clock for controlling frame rate
-clock = pygame.time.Clock()  # Define clock here to control FPS
+clock = pygame.time.Clock()
 
 # Sprite groups
 projectiles = pygame.sprite.Group()
@@ -151,7 +165,7 @@ try:
             player.update(keys, platforms, projectiles, snake.segments, acid_group)
             snake.update(food_group, acid_group, projectiles)
             acid_group.update(platforms, snake.segments, projectiles)
-            projectiles.update(platforms, snake.segments, acid_group)
+            projectiles.update(platforms, snake.segments, acid_group, projectiles)  # Updated call
 
             if player.health <= 0:
                 game_state = "lost"
@@ -202,7 +216,7 @@ try:
             screen.blit(font.render("Press 'R' to restart or 'Q' to quit", True, WHITE), (WIDTH // 2 - 150, HEIGHT // 2 + 40))
 
         pygame.display.flip()
-        clock.tick(60)  # Use clock to limit to 60 FPS
+        clock.tick(60)
 except Exception as e:
     logging.error(f"An error occurred: {e}", exc_info=True)
     pygame.quit()

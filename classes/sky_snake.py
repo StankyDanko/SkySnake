@@ -1,10 +1,9 @@
-# sky_snake.py
 import pygame
 import random
 import math
-from config import RED, WIDTH, HEIGHT
-from food import Food
-from acid_droplet import AcidDroplet
+from config.config import RED, WIDTH, HEIGHT
+from classes.food import Food
+from classes.acid_droplet import AcidDroplet
 
 class SkySnake:
     def __init__(self):

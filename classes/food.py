@@ -1,7 +1,6 @@
-# food.py
 import pygame
 import random
-from config import ORANGE, WIDTH, HEIGHT
+from config.config import ORANGE, WIDTH, HEIGHT
 
 class Food(pygame.sprite.Sprite):
     def __init__(self):

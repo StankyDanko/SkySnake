@@ -1,6 +1,5 @@
-# acid_droplet.py
 import pygame
-from config import NEON_GREEN, HEIGHT
+from config.config import NEON_GREEN, HEIGHT
 
 class AcidDroplet(pygame.sprite.Sprite):
     def __init__(self, x, y):

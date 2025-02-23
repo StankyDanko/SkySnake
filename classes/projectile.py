@@ -1,9 +1,6 @@
 import pygame
 import logging  # Import logging module
-from config import ammo_colors, WIDTH, HEIGHT, CYAN
-
-# Configure logging for projectile actions
-logging.basicConfig(filename='game.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+from config.config import ammo_colors, WIDTH, HEIGHT, CYAN
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, x, y, vx, vy, ammo_type):
@@ -24,7 +21,7 @@ class Projectile(pygame.sprite.Sprite):
         self.max_bounces = 3 if ammo_type == "bouncy" else 0
         self.timer = 0
 
-    def update(self, platforms, snake_segments, acid_group):
+    def update(self, platforms, snake_segments, acid_group, projectiles):
         if not self.stopped:
             logging.debug(f"Updating projectile: pos={self.pos}, stopped={self.stopped}")
             self.pos[0] += self.vx
