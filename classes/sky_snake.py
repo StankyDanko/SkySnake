@@ -1,3 +1,4 @@
+# classes/sky_snake.py
 import pygame
 import random
 import math

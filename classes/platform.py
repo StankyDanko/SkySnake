@@ -1,3 +1,4 @@
+# classes/platform.py
 import pygame
 from config.config import GREY
 

@@ -1,3 +1,4 @@
+# classes/acid_droplet.py
 import pygame
 from config.config import NEON_GREEN, HEIGHT
 

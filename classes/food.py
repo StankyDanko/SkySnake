@@ -1,3 +1,4 @@
+# classes/food.py
 import pygame
 import random
 from config.config import ORANGE, WIDTH, HEIGHT

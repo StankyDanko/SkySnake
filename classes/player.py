@@ -1,3 +1,4 @@
+# classes/player.py
 import pygame
 import logging  # Import logging module
 from config.config import WHITE, WIDTH, HEIGHT, velocity_multipliers
@@ -19,8 +20,11 @@ class Player(pygame.sprite.Sprite):
         self.ammo_types = ["regular", "bouncy", "piercing", "feathershot"]
         self.ammo_counts = {"regular": 10, "bouncy": 5, "piercing": 3, "feathershot": 2}
         self.last_y = self.rect.y
+        self.on_food = False  # Flag for standing on food
+        self.on_feathershot = False  # Flag for standing on feathershot platform
 
-    def update(self, keys, platforms, projectiles, snake_segments, acid_group):
+    def update(self, keys, platforms, projectiles, snake_segments, acid_group, food_group):
+        # Handle horizontal movement
         if keys[pygame.K_a]:
             self.rect.x -= self.speed
         if keys[pygame.K_d]:
@@ -29,11 +33,16 @@ class Player(pygame.sprite.Sprite):
             self.vy = self.jump_power
             self.on_ground = False
 
+        # Apply gravity
         self.vy += self.gravity
         self.rect.y += self.vy
 
+        # Reset collision flags
         self.on_ground = False
+        self.on_food = False
+        self.on_feathershot = False
 
+        # Check collision with platforms
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
                 if self.vy > 0 and self.rect.bottom - self.vy <= platform.rect.top + 2:
@@ -48,17 +57,34 @@ class Player(pygame.sprite.Sprite):
                             self.health = 0
                 elif self.vy == 0 and self.rect.bottom <= platform.rect.top + 2:
                     self.on_ground = True
+
+        # Check collision with food (as platforms)
+        for food in food_group:
+            if self.vy > 0 and self.rect.bottom > food.rect.top and self.rect.bottom <= food.rect.top + 10 and self.rect.left < food.rect.right and self.rect.right > food.rect.left:
+                self.on_food = True
+                self.on_ground = True
+                self.vy = 0
+                self.rect.bottom = food.rect.top
+
+        # Check collision with feathershot platforms
+        for proj in projectiles:
+            if proj.is_platform and self.vy > 0 and self.rect.bottom > proj.rect.top and self.rect.bottom <= proj.rect.top + 10 and self.rect.left < proj.rect.right and self.rect.right > proj.rect.left:
+                self.on_feathershot = True
+                self.on_ground = True
+                self.vy = 0
+                self.rect.bottom = proj.rect.top
+
         self.last_y = self.rect.y
 
-        for proj in projectiles:
-            if proj.is_platform and self.rect.colliderect(proj.rect):
-                if self.vy > 0 and self.rect.bottom - self.vy <= proj.rect.top + 2:
-                    self.rect.bottom = proj.rect.top
-                    self.vy = 0
-                    self.on_ground = True
-                elif self.vy == 0 and self.rect.bottom <= proj.rect.top + 2:
-                    self.on_ground = True
+        # Apply damage or health regeneration
+        if self.on_food:
+            self.health -= 2 / 60  # 2 HP per second damage
+        if self.on_feathershot:
+            self.health += 1 / 60  # 1 HP per second regeneration
+        self.health = max(0, min(100, self.health))  # Clamp health between 0 and 100
+        logging.debug(f"Player health: {self.health}")
 
+        # Check collisions with snake, acid, and pickups
         for segment in snake_segments:
             if self.rect.colliderect(segment.rect):
                 self.health -= 0.666
@@ -74,6 +100,7 @@ class Player(pygame.sprite.Sprite):
                     self.ammo_counts[proj.ammo_type] += 1
                     proj.kill()
 
+        # Keep player within screen bounds
         self.rect.clamp_ip(pygame.Rect(0, 0, WIDTH, HEIGHT))
 
     def shoot(self, mx, my, power):
