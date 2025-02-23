@@ -1,7 +1,10 @@
-# player.py
 import pygame
-from config import WHITE, WIDTH, HEIGHT
+import logging  # Import logging module
+from config import WHITE, WIDTH, HEIGHT, velocity_multipliers
 from projectile import Projectile
+
+# Configure logging for player actions
+logging.basicConfig(filename='game.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -87,5 +90,8 @@ class Player(pygame.sprite.Sprite):
                 v = power * 0.2 * multiplier
                 vx = v * (dx / distance)
                 vy = v * (dy / distance)
+                logging.info(f"Shooting {self.current_ammo} projectile with power {power}")
                 return Projectile(self.rect.centerx, self.rect.centery, vx, vy, self.current_ammo)
+        else:
+            logging.warning(f"Cannot shoot: No ammo for {self.current_ammo}")
         return None

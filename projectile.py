@@ -1,6 +1,9 @@
-# projectile.py
 import pygame
-from config import ammo_colors, WIDTH, HEIGHT
+import logging  # Import logging module
+from config import ammo_colors, WIDTH, HEIGHT, CYAN
+
+# Configure logging for projectile actions
+logging.basicConfig(filename='game.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, x, y, vx, vy, ammo_type):
@@ -23,6 +26,7 @@ class Projectile(pygame.sprite.Sprite):
 
     def update(self, platforms, snake_segments, acid_group):
         if not self.stopped:
+            logging.debug(f"Updating projectile: pos={self.pos}, stopped={self.stopped}")
             self.pos[0] += self.vx
             self.pos[1] += self.vy
             self.vy += self.gravity
@@ -30,15 +34,11 @@ class Projectile(pygame.sprite.Sprite):
 
             for segment in snake_segments:
                 if self.rect.colliderect(segment.rect) and not self.is_platform:
-                    if len(snake_segments) > 1:
-                        snake_segments.pop()
+                    logging.debug(f"Collision detected with segment at {segment.rect}")
+                    if len(snake_segments) > 1 and segment != snake_segments[0]:
+                        snake_segments.remove(segment)
                         if self.ammo_type != "piercing":
                             self.kill()
-                    elif segment == snake_segments[0]:
-                        print("You win!")
-                        global running
-                        running = False
-                        self.kill()
 
             if self.ammo_type == "feathershot" and not self.is_platform:
                 if self.prev_vy <= 0 and self.vy > 0:
